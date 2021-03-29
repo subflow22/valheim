@@ -141,9 +141,3 @@ systemctl start valheimserver && systemctl enable valheimserver
 systemctl status valheimserver >> /var/log/userdata 2>&1
 
 echo "completed" >> /var/log/userdata 2>&1
-
-#892970
-#896660
-#/root/.config/unity3d/IronGate/Valheim/worlds
-#new #mount -t efs -o tls,accesspoint=fsap-00a30b7d514ee126f fs-6a9c5912: /root/.config/unity3d/IronGate/Valheim/worlds
-#persist #echo "fs-6a9c5912 /root/.config/unity3d/IronGate/Valheim/worlds efs _netdev,noresvport,tls,accesspoint=fsap-00a30b7d514ee126f 0 0" >> /etc/fstab
