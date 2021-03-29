@@ -1,5 +1,10 @@
 #!/bin/bash
 
+#assign name with instance_id and account_id so as to acutally be useful
+instance_id=$(curl http://169.254.169.254/latest/meta-data/instance-id)
+account_id=$(curl http://169.254.169.254/latest/dynamic/instance-identity/document | awk '/accountId/ {gsub("\"", "", $3); print $3}' | tr -d ,)
+hostnamectl set-hostname $instance_id-$account_id
+
 #upgrades and prerequisites
 echo "upgrades" >> /var/log/userdata 2>&1
 yum upgrade -y -q
@@ -30,7 +35,7 @@ cp -f $cwl_path/amazon-cloudwatch-agent.json $cwl_path/etc/amazon-cloudwatch-age
 cp -f $cwl_path/amazon-cloudwatch-agent.json $cwl_path/etc/amazon-cloudwatch-agent.json >> /var/log/userdata 2>&1
 systemctl restart amazon-cloudwatch-agent && systemctl status amazon-cloudwatch-agent >> /var/log/userdata 2>&1
 
-#systemctl stop amazon-cloudwatch-agent #too expensive $$$
+systemctl stop amazon-cloudwatch-agent #too expensive $$$
 
 #aws ssm agent
 echo "ssm setup" >> /var/log/userdata 2>&1
@@ -119,21 +124,6 @@ LimitNOFILE=100000
 WantedBy=multi-user.target
 EOF
 
-#scripts
-echo "setting backup script" >> /var/log/userdata 2>&1
-cat <<"EOF" > /opt/valheim/s3_backup.sh
-#!/bin/bash
-systemctl stop valheimserver
-world_path=$(mount | grep Valheim | awk '{ print $3 }')
-for i in $(ls $world_path/${WORLD_NAME}.*); do 
-  aws s3 cp $i s3://${BUCKET_NAME}/$(date +"%Y_%m_%d_%I_%M_%p")/; 
-done
-systemctl start valheimserver
-EOF
-chmod 700 /opt/valheim/s3_backup.sh
-
-echo "completed" >> /var/log/userdata 2>&1
-
 systemctl daemon-reload
 
 sleep 10
@@ -150,6 +140,10 @@ mount | grep Valheim >> /var/log/userdata 2>&1
 systemctl start valheimserver && systemctl enable valheimserver
 systemctl status valheimserver >> /var/log/userdata 2>&1
 
+echo "completed" >> /var/log/userdata 2>&1
+
 #892970
 #896660
 #/root/.config/unity3d/IronGate/Valheim/worlds
+#new #mount -t efs -o tls,accesspoint=fsap-00a30b7d514ee126f fs-6a9c5912: /root/.config/unity3d/IronGate/Valheim/worlds
+#persist #echo "fs-6a9c5912 /root/.config/unity3d/IronGate/Valheim/worlds efs _netdev,noresvport,tls,accesspoint=fsap-00a30b7d514ee126f 0 0" >> /etc/fstab
