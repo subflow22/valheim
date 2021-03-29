@@ -3,14 +3,14 @@ data "template_file" "cloudwatch" {
     template	= file("${path.module}/files/cloudwatch.json.tpl")
 
 	vars = {
-		NAMESPACE			= var.namespace
-		REGION				= var.region
-		IID					= "$${aws:ImageId}"
-		IND					= "$${aws:InstanceId}"
-		IST					= "$${aws:InstanceType}"
-		ASG					= "$${aws:AutoScalingGroupName}"
-		GAME_DATA			= var.game_data
-		LOG_GROUP			= aws_cloudwatch_log_group.default.name
+		NAMESPACE	= var.namespace
+		REGION		= var.region
+		IID			= "$${aws:ImageId}"
+		IND			= "$${aws:InstanceId}"
+		IST			= "$${aws:InstanceType}"
+		ASG			= "$${aws:AutoScalingGroupName}"
+		GAME_DATA	= var.game_data
+		LOG_GROUP	= aws_cloudwatch_log_group.default.name
 	}
 }
 
@@ -19,10 +19,10 @@ data "template_file" "init" {
 	template	= file("${path.module}/files/init.sh.tpl")
 	
 	vars = {
-		NAMESPACE 		= var.namespace
-		EFS_AP    		= aws_efs_access_point.game.id
-		EFS_ID    		= aws_efs_file_system.default.id
-		GAME_DATA	    = var.game_data
+		NAMESPACE		= var.namespace
+		EFS_AP			= aws_efs_access_point.game.id
+		EFS_ID			= aws_efs_file_system.default.id
+		GAME_DATA		= var.game_data
 		WORLD_PASS		= var.world_pass
 		WORLD_DISPLAY	= var.world_display
 		WORLD_NAME		= var.world_name
@@ -58,7 +58,7 @@ resource "aws_instance" "default" {
 	iam_instance_profile	= aws_iam_instance_profile.default.id
 	user_data				= data.template_file.init.rendered
 	
-	#lifecycle {
-	#	ignore_changes = [user_data]
-	#}
+	lifecycle {
+		ignore_changes = [user_data]
+	}
 }

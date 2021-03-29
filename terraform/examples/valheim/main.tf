@@ -114,7 +114,7 @@ module ec2_steam {
 	acl				= var.acl
 	pubnets			= var.pubnets
 	az_names		= sort(data.aws_availability_zones.available.names)
-	vpc_cidr    	= var.vpc_cidr
+	vpc_cidr		= var.vpc_cidr
 	world_pass		= var.world_pass
 	world_display	= var.world_display
 	world_name		= var.world_name
@@ -128,11 +128,11 @@ module ec2_steam {
 }
 
 output "ssh_connect" {
-  value = module.valheim.ssh_connect
+	value = module.valheim.ssh_connect
 }
 
 output "server_ip" {
-  value = module.valheim.server_ip
+	value = module.valheim.server_ip
 }
 
 output "vpc_id" {
